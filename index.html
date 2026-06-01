@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saúde & Bem-estar - Rastreador de Saúde</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-title">
+                <div class="icon-circle">📊</div>
+                <h1>Saúde & Bem-estar</h1>
+            </div>
+            <p class="header-subtitle">Rastreie sua evolução</p>
+        </div>
+    </header>
+
+    <!-- Main -->
+    <main class="container">
+        <!-- Navigation Tabs -->
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="dashboard">📊 Dashboard</button>
+            <button class="tab-btn" data-tab="novo">➕ Novo Registro</button>
+            <button class="tab-btn" data-tab="graficos">📈 Gráficos</button>
+            <button class="tab-btn" data-tab="historico">📋 Histórico</button>
+        </nav>
+
+        <!-- Dashboard Tab -->
+        <div class="tab-content active" id="dashboard">
+            <div id="dashboardContent"></div>
+        </div>
+
+        <!-- Novo Registro Tab -->
+        <div class="tab-content" id="novo">
+            <div class="form-container">
+                <h2>Novo Check-up</h2>
+                <form id="healthForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="date">Data</label>
+                            <input type="date" id="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="weight">Peso (kg)</label>
+                            <input type="number" id="weight" placeholder="70" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label for="height">Altura (cm)</label>
+                            <input type="number" id="height" placeholder="170">
+                        </div>
+                        <div class="form-group">
+                            <label for="systolic">Pressão Sistólica (mmHg)</label>
+                            <input type="number" id="systolic" placeholder="120">
+                        </div>
+                        <div class="form-group">
+                            <label for="diastolic">Pressão Diastólica (mmHg)</label>
+                            <input type="number" id="diastolic" placeholder="80">
+                        </div>
+                        <div class="form-group">
+                            <label for="heartRate">Freq. Cardíaca (bpm)</label>
+                            <input type="number" id="heartRate" placeholder="72">
+                        </div>
+                        <div class="form-group">
+                            <label for="cholesterol">Colesterol (mg/dL)</label>
+                            <input type="number" id="cholesterol" placeholder="180">
+                        </div>
+                        <div class="form-group">
+                            <label for="glucose">Glicemia (mg/dL)</label>
+                            <input type="number" id="glucose" placeholder="90">
+                        </div>
+                    </div>
+                    <div class="form-group full">
+                        <label for="notes">Observações</label>
+                        <textarea id="notes" placeholder="Qualquer observação adicional..." rows="3"></textarea>
+                    </div>
+                    <div class="form-buttons">
+                        <button type="submit" class="btn btn-primary">💾 Salvar Registro</button>
+                        <button type="button" class="btn btn-secondary" onclick="switchTab('dashboard')">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Gráficos Tab -->
+        <div class="tab-content" id="graficos">
+            <div id="graficosContent"></div>
+        </div>
+
+        <!-- Histórico Tab -->
+        <div class="tab-content" id="historico">
+            <div id="historicoContent"></div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

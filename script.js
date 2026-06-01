@@ -87,18 +87,19 @@ function renderDashboard() {
     };
     
     let html = `<h2 class="dashboard-title">Último Check-up: ${formatDate(lastRecord.date)}</h2>`;
+    
+    // Seção Sinais Vitais
+    html += '<h3 class="dashboard-section-title">📊 Sinais Vitais</h3>';
     html += '<div class="cards-grid">';
     
-    const metrics = [
+    const vitalMetrics = [
         { label: 'Peso', value: lastRecord.weight, unit: 'kg', field: 'weight', icon: '⚖️' },
         { label: 'IMC', value: lastRecord.bmi, unit: '', field: 'bmi', icon: '📏' },
         { label: 'Pressão', value: lastRecord.systolic && lastRecord.diastolic ? `${lastRecord.systolic}/${lastRecord.diastolic}` : null, unit: 'mmHg', field: 'systolic', icon: '💓' },
-        { label: 'Freq. Cardíaca', value: lastRecord.heartRate, unit: 'bpm', field: 'heartRate', icon: '❤️' },
-        { label: 'Colesterol', value: lastRecord.cholesterol, unit: 'mg/dL', field: 'cholesterol', icon: '🧬' },
-        { label: 'Glicemia', value: lastRecord.glucose, unit: 'mg/dL', field: 'glucose', icon: '🩸' }
+        { label: 'Freq. Cardíaca', value: lastRecord.heartRate, unit: 'bpm', field: 'heartRate', icon: '❤️' }
     ];
     
-    metrics.forEach(metric => {
+    vitalMetrics.forEach(metric => {
         const statusClass = getStatusClass(metric.field, metric.value);
         const change = getChange(metric.field);
         
@@ -114,6 +115,93 @@ function renderDashboard() {
     });
     
     html += '</div>';
+    
+    // Seção Lipídios e Glicemia
+    html += '<h3 class="dashboard-section-title">🧪 Lipídios e Glicemia</h3>';
+    html += '<div class="cards-grid">';
+    
+    const lipidMetrics = [
+        { label: 'Colesterol Total', value: lastRecord.cholesterol, unit: 'mg/dL', field: 'cholesterol', icon: '🧬' },
+        { label: 'HDL (Bom)', value: lastRecord.hdl, unit: 'mg/dL', field: 'hdl', icon: '✅' },
+        { label: 'LDL (Ruim)', value: lastRecord.ldl, unit: 'mg/dL', field: 'ldl', icon: '⚠️' },
+        { label: 'Triglicerídeos', value: lastRecord.triglycerides, unit: 'mg/dL', field: 'triglycerides', icon: '📈' },
+        { label: 'Glicemia', value: lastRecord.glucose, unit: 'mg/dL', field: 'glucose', icon: '🩸' }
+    ];
+    
+    lipidMetrics.forEach(metric => {
+        const statusClass = getStatusClass(metric.field, metric.value);
+        const change = getChange(metric.field);
+        
+        html += `
+            <div class="card">
+                <div class="card-icon">${metric.icon}</div>
+                <div class="card-label">${metric.label}</div>
+                <div class="card-value ${statusClass}">${metric.value ?? '—'}</div>
+                <div class="card-unit">${metric.unit}</div>
+                ${change ? `<div class="card-change" style="color: ${change.startsWith('+') ? '#dc2626' : '#16a34a'}">${change} desde último</div>` : ''}
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    
+    // Seção Hemograma
+    html += '<h3 class="dashboard-section-title">🔴 Hemograma</h3>';
+    html += '<div class="cards-grid">';
+    
+    const hematologyMetrics = [
+        { label: 'Hemoglobina', value: lastRecord.hemoglobin, unit: 'g/dL', field: 'hemoglobin', icon: '🔴' },
+        { label: 'Hematócrito', value: lastRecord.hematocrit, unit: '%', field: 'hematocrit', icon: '📊' },
+        { label: 'Glóbulos Vermelhos', value: lastRecord.rbc, unit: 'milhões/µL', field: 'rbc', icon: '●' },
+        { label: 'Glóbulos Brancos', value: lastRecord.wbc, unit: 'mil/µL', field: 'wbc', icon: '⚪' },
+        { label: 'Plaquetas', value: lastRecord.platelets, unit: 'mil/µL', field: 'platelets', icon: '◆' }
+    ];
+    
+    hematologyMetrics.forEach(metric => {
+        const statusClass = getStatusClass(metric.field, metric.value);
+        const change = getChange(metric.field);
+        
+        html += `
+            <div class="card">
+                <div class="card-icon">${metric.icon}</div>
+                <div class="card-label">${metric.label}</div>
+                <div class="card-value ${statusClass}">${metric.value ?? '—'}</div>
+                <div class="card-unit">${metric.unit}</div>
+                ${change ? `<div class="card-change" style="color: ${change.startsWith('+') ? '#dc2626' : '#16a34a'}">${change} desde último</div>` : ''}
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    
+    // Seção Função Renal e Hepática
+    html += '<h3 class="dashboard-section-title">🫘 Função Renal e Hepática</h3>';
+    html += '<div class="cards-grid">';
+    
+    const organMetrics = [
+        { label: 'Creatinina', value: lastRecord.creatinine, unit: 'mg/dL', field: 'creatinine', icon: '🫘' },
+        { label: 'Ureia', value: lastRecord.urea, unit: 'mg/dL', field: 'urea', icon: '💧' },
+        { label: 'TGO/AST', value: lastRecord.ast, unit: 'U/L', field: 'ast', icon: '🧬' },
+        { label: 'TGP/ALT', value: lastRecord.alt, unit: 'U/L', field: 'alt', icon: '🧬' },
+        { label: 'Bilirrubina', value: lastRecord.bilirubin, unit: 'mg/dL', field: 'bilirubin', icon: '🟡' },
+        { label: 'Albumina', value: lastRecord.albumin, unit: 'g/dL', field: 'albumin', icon: '🧪' },
+        { label: 'Proteína Total', value: lastRecord.totalProtein, unit: 'g/dL', field: 'totalProtein', icon: '🧬' }
+    ];
+    
+    organMetrics.forEach(metric => {
+        const statusClass = getStatusClass(metric.field, metric.value);
+        const change = getChange(metric.field);
+        
+        html += `
+            <div class="card">
+                <div class="card-icon">${metric.icon}</div>
+                <div class="card-label">${metric.label}</div>
+                <div class="card-value ${statusClass}">${metric.value ?? '—'}</div>
+                <div class="card-unit">${metric.unit}</div>
+                ${change ? `<div class="card-change" style="color: ${change.startsWith('+') ? '#dc2626' : '#16a34a'}">${change} desde último</div>` : ''}
+            </div>
+        `;
+    });
     
     if (lastRecord.notes) {
         html += `
@@ -140,8 +228,23 @@ function renderGraficos() {
         { key: 'weight', label: 'Peso (kg)', color: '#10b981' },
         { key: 'bmi', label: 'IMC', color: '#3b82f6' },
         { key: 'systolic', label: 'Pressão Sistólica (mmHg)', color: '#ef4444' },
-        { key: 'cholesterol', label: 'Colesterol (mg/dL)', color: '#f59e0b' },
+        { key: 'cholesterol', label: 'Colesterol Total (mg/dL)', color: '#f59e0b' },
+        { key: 'hdl', label: 'HDL - Colesterol Bom (mg/dL)', color: '#10b981' },
+        { key: 'ldl', label: 'LDL - Colesterol Ruim (mg/dL)', color: '#ef4444' },
+        { key: 'triglycerides', label: 'Triglicerídeos (mg/dL)', color: '#f97316' },
         { key: 'glucose', label: 'Glicemia (mg/dL)', color: '#ec4899' },
+        { key: 'hemoglobin', label: 'Hemoglobina (g/dL)', color: '#dc2626' },
+        { key: 'hematocrit', label: 'Hematócrito (%)', color: '#991b1b' },
+        { key: 'rbc', label: 'Glóbulos Vermelhos (milhões/µL)', color: '#b91c1c' },
+        { key: 'wbc', label: 'Glóbulos Brancos (mil/µL)', color: '#7c2d12' },
+        { key: 'platelets', label: 'Plaquetas (mil/µL)', color: '#92400e' },
+        { key: 'creatinine', label: 'Creatinina (mg/dL)', color: '#6b7280' },
+        { key: 'urea', label: 'Ureia (mg/dL)', color: '#78716c' },
+        { key: 'ast', label: 'TGO/AST (U/L)', color: '#854d0e' },
+        { key: 'alt', label: 'TGP/ALT (U/L)', color: '#92400e' },
+        { key: 'bilirubin', label: 'Bilirrubina Total (mg/dL)', color: '#fbbf24' },
+        { key: 'albumin', label: 'Albumina (g/dL)', color: '#06b6d4' },
+        { key: 'totalProtein', label: 'Proteína Total (g/dL)', color: '#0891b2' },
         { key: 'heartRate', label: 'Freq. Cardíaca (bpm)', color: '#8b5cf6' }
     ];
     
@@ -259,6 +362,21 @@ function renderHistorico() {
                     ${record.heartRate ? `<div class="historico-data-item"><div class="historico-data-label">FC</div><div class="historico-data-value">${record.heartRate} bpm</div></div>` : ''}
                     ${record.cholesterol ? `<div class="historico-data-item"><div class="historico-data-label">Colesterol</div><div class="historico-data-value">${record.cholesterol} mg/dL</div></div>` : ''}
                     ${record.glucose ? `<div class="historico-data-item"><div class="historico-data-label">Glicemia</div><div class="historico-data-value">${record.glucose} mg/dL</div></div>` : ''}
+                    ${record.hemoglobin ? `<div class="historico-data-item"><div class="historico-data-label">Hemoglobina</div><div class="historico-data-value">${record.hemoglobin} g/dL</div></div>` : ''}
+                    ${record.hematocrit ? `<div class="historico-data-item"><div class="historico-data-label">Hematócrito</div><div class="historico-data-value">${record.hematocrit}%</div></div>` : ''}
+                    ${record.rbc ? `<div class="historico-data-item"><div class="historico-data-label">Glób. Vermelhos</div><div class="historico-data-value">${record.rbc}</div></div>` : ''}
+                    ${record.wbc ? `<div class="historico-data-item"><div class="historico-data-label">Glób. Brancos</div><div class="historico-data-value">${record.wbc}</div></div>` : ''}
+                    ${record.platelets ? `<div class="historico-data-item"><div class="historico-data-label">Plaquetas</div><div class="historico-data-value">${record.platelets}</div></div>` : ''}
+                    ${record.hdl ? `<div class="historico-data-item"><div class="historico-data-label">HDL</div><div class="historico-data-value">${record.hdl} mg/dL</div></div>` : ''}
+                    ${record.ldl ? `<div class="historico-data-item"><div class="historico-data-label">LDL</div><div class="historico-data-value">${record.ldl} mg/dL</div></div>` : ''}
+                    ${record.triglycerides ? `<div class="historico-data-item"><div class="historico-data-label">Triglicerídeos</div><div class="historico-data-value">${record.triglycerides}</div></div>` : ''}
+                    ${record.creatinine ? `<div class="historico-data-item"><div class="historico-data-label">Creatinina</div><div class="historico-data-value">${record.creatinine}</div></div>` : ''}
+                    ${record.urea ? `<div class="historico-data-item"><div class="historico-data-label">Ureia</div><div class="historico-data-value">${record.urea}</div></div>` : ''}
+                    ${record.ast ? `<div class="historico-data-item"><div class="historico-data-label">TGO/AST</div><div class="historico-data-value">${record.ast}</div></div>` : ''}
+                    ${record.alt ? `<div class="historico-data-item"><div class="historico-data-label">TGP/ALT</div><div class="historico-data-value">${record.alt}</div></div>` : ''}
+                    ${record.bilirubin ? `<div class="historico-data-item"><div class="historico-data-label">Bilirrubina</div><div class="historico-data-value">${record.bilirubin}</div></div>` : ''}
+                    ${record.albumin ? `<div class="historico-data-item"><div class="historico-data-label">Albumina</div><div class="historico-data-value">${record.albumin}</div></div>` : ''}
+                    ${record.totalProtein ? `<div class="historico-data-item"><div class="historico-data-label">Proteína Total</div><div class="historico-data-value">${record.totalProtein}</div></div>` : ''}
                 </div>
                 ${record.notes ? `<div class="historico-notes">${record.notes}</div>` : ''}
             </div>
@@ -296,6 +414,21 @@ document.getElementById('healthForm').addEventListener('submit', function(e) {
         heartRate: parseInt(document.getElementById('heartRate').value) || null,
         cholesterol: parseInt(document.getElementById('cholesterol').value) || null,
         glucose: parseInt(document.getElementById('glucose').value) || null,
+        hemoglobin: parseFloat(document.getElementById('hemoglobin').value) || null,
+        hematocrit: parseFloat(document.getElementById('hematocrit').value) || null,
+        rbc: parseFloat(document.getElementById('rbc').value) || null,
+        wbc: parseFloat(document.getElementById('wbc').value) || null,
+        platelets: parseInt(document.getElementById('platelets').value) || null,
+        hdl: parseInt(document.getElementById('hdl').value) || null,
+        ldl: parseInt(document.getElementById('ldl').value) || null,
+        triglycerides: parseInt(document.getElementById('triglycerides').value) || null,
+        creatinine: parseFloat(document.getElementById('creatinine').value) || null,
+        urea: parseInt(document.getElementById('urea').value) || null,
+        ast: parseInt(document.getElementById('ast').value) || null,
+        alt: parseInt(document.getElementById('alt').value) || null,
+        bilirubin: parseFloat(document.getElementById('bilirubin').value) || null,
+        albumin: parseFloat(document.getElementById('albumin').value) || null,
+        totalProtein: parseFloat(document.getElementById('totalProtein').value) || null,
         notes: document.getElementById('notes').value
     };
     

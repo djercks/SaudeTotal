@@ -47,59 +47,166 @@
                 <form id="healthForm">
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="date">Data</label>
+                            <label for="date">Data do Registro</label>
                             <input type="date" id="date" required>
                         </div>
                     </div>
 
-                    <!-- Seção Energia & Vitalidade -->
-                    <div class="form-section">
-                        <h3>🔋 Energia &amp; Vitalidade</h3>
+                    <!-- TIER 1: CRÍTICOS -->
+                    <div class="form-section tier-1">
+                        <div class="tier-header">
+                            <span class="tier-badge">🔴 TIER 1</span>
+                            <h3>Exames Críticos para Energia</h3>
+                            <p class="tier-description">Estes 6 exames revelam 90% dos problemas de energia e clareza mental</p>
+                        </div>
                         <div class="form-grid">
                             <div class="form-group">
-                                <label for="vitaminaD">Vitamina D (ng/mL)</label>
-                                <input type="number" step="0.1" id="vitaminaD" placeholder="Ex: 45.2">
+                                <label for="tsh">TSH <span class="ref-normal">(Normal: 0,4-4 mUI/L)</span></label>
+                                <input type="number" step="0.01" id="tsh" placeholder="Ex: 2.5" data-min="0.4" data-max="4" data-type="tsh">
+                                <small class="ref-hint">Tireoide → 80% da energia corporal</small>
                             </div>
                             <div class="form-group">
-                                <label for="ferritina">Ferritina (ng/mL)</label>
-                                <input type="number" step="0.1" id="ferritina" placeholder="Ex: 120">
+                                <label for="vitaminaD">Vitamina D <span class="ref-normal">(Normal: 30-100 ng/mL)</span></label>
+                                <input type="number" step="0.1" id="vitaminaD" placeholder="Ex: 45" data-min="30" data-max="100" data-type="vitaminaD">
+                                <small class="ref-hint">Trabalha à noite = deficiência garantida</small>
                             </div>
                             <div class="form-group">
-                                <label for="b12">Vitamina B12 (pg/mL)</label>
-                                <input type="number" step="0.1" id="b12" placeholder="Ex: 450">
+                                <label for="ferritina">Ferritina <span class="ref-normal">(Normal: 50-200 ng/mL)</span></label>
+                                <input type="number" step="0.1" id="ferritina" placeholder="Ex: 120" data-min="50" data-max="200" data-type="ferritina">
+                                <small class="ref-hint">Transporte de oxigênio → fadiga se baixa</small>
                             </div>
                             <div class="form-group">
-                                <label for="tsh">TSH (µUI/mL)</label>
-                                <input type="number" step="0.01" id="tsh" placeholder="Ex: 2.5">
+                                <label for="b12">Vitamina B12 <span class="ref-normal">(Normal: 200-900 pg/mL)</span></label>
+                                <input type="number" step="0.1" id="b12" placeholder="Ex: 450" data-min="200" data-max="900" data-type="b12">
+                                <small class="ref-hint">Energia celular + clareza mental</small>
                             </div>
                             <div class="form-group">
-                                <label for="testosterona">Testosterona Livre (ng/dL)</label>
-                                <input type="number" step="0.1" id="testosterona" placeholder="Ex: 12.5">
+                                <label for="glicose">Glicose em Jejum <span class="ref-normal">(Normal: 70-100 mg/dL)</span></label>
+                                <input type="number" step="1" id="glicose" placeholder="Ex: 85" data-min="70" data-max="100" data-type="glicose">
+                                <small class="ref-hint">Estabilidade energética durante plantão</small>
                             </div>
                             <div class="form-group">
-                                <label for="cortisol">Cortisol Manhã / Basal (µg/dL)</label>
-                                <input type="number" step="0.1" id="cortisol" placeholder="Ex: 18.5">
+                                <label for="hemoglobina">Hemoglobina <span class="ref-normal">(Normal: 13-17 g/dL)</span></label>
+                                <input type="number" step="0.1" id="hemoglobina" placeholder="Ex: 14.5" data-min="13" data-max="17" data-type="hemoglobina">
+                                <small class="ref-hint">Capacidade de oxigênio no sangue</small>
                             </div>
+                        </div>
+                    </div>
 
+                    <!-- TIER 2: MUITO IMPORTANTES -->
+                    <div class="form-section tier-2">
+                        <div class="tier-header">
+                            <span class="tier-badge">🟡 TIER 2</span>
+                            <h3>Exames Complementares Importantes</h3>
+                        </div>
+                        <div class="form-grid">
                             <div class="form-group">
-                                <label for="energiaAcordar">Energia ao Acordar (1-10)</label>
-                                <input type="number" min="1" max="10" id="energiaAcordar" value="5">
+                                <label for="magnesio">Magnésio <span class="ref-normal">(Normal: 1,7-2,2 mg/dL)</span></label>
+                                <input type="number" step="0.1" id="magnesio" placeholder="Ex: 2.0" data-min="1.7" data-max="2.2" data-type="magnesio">
+                                <small class="ref-hint">Energia muscular + stress</small>
                             </div>
                             <div class="form-group">
-                                <label for="energiaMeioDia">Energia Meio-dia (1-10)</label>
-                                <input type="number" min="1" max="10" id="energiaMeioDia" value="5">
+                                <label for="zinco">Zinco <span class="ref-normal">(Normal: 70-150 µg/dL)</span></label>
+                                <input type="number" step="1" id="zinco" placeholder="Ex: 100" data-min="70" data-max="150" data-type="zinco">
+                                <small class="ref-hint">Imunidade + recuperação</small>
                             </div>
                             <div class="form-group">
-                                <label for="energiaFimDia">Energia Fim do Dia (1-10)</label>
-                                <input type="number" min="1" max="10" id="energiaFimDia" value="5">
+                                <label for="testosterona">Testosterona Livre <span class="ref-normal">(Normal: 8-27 ng/dL)</span></label>
+                                <input type="number" step="0.1" id="testosterona" placeholder="Ex: 15" data-min="8" data-max="27" data-type="testosterona">
+                                <small class="ref-hint">Força + recuperação + motivação</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="cortisol">Cortisol (Manhã) <span class="ref-normal">(Normal: 5-23 µg/dL)</span></label>
+                                <input type="number" step="0.1" id="cortisol" placeholder="Ex: 15" data-min="5" data-max="23" data-type="cortisol">
+                                <small class="ref-hint">Gerenciamento de stress do plantão</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="homocisteina">Homocisteína <span class="ref-normal">(Normal: &lt;10 µmol/L)</span></label>
+                                <input type="number" step="0.1" id="homocisteina" placeholder="Ex: 7" data-min="0" data-max="10" data-type="homocisteina">
+                                <small class="ref-hint">Energia celular + cognição</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="pcr">PCR - Proteína C Reativa <span class="ref-normal">(Normal: &lt;3 mg/L)</span></label>
+                                <input type="number" step="0.1" id="pcr" placeholder="Ex: 1.5" data-min="0" data-max="3" data-type="pcr">
+                                <small class="ref-hint">Inflamação sistêmica = fadiga</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TIER 3: COMPLEMENTARES -->
+                    <div class="form-section tier-3">
+                        <div class="tier-header">
+                            <span class="tier-badge">🟢 TIER 3</span>
+                            <h3>Exames Complementares (Opcional)</h3>
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="folatoB9">Ácido Fólico (B9) <span class="ref-normal">(Normal: &gt;5,4 ng/mL)</span></label>
+                                <input type="number" step="0.1" id="folatoB9" placeholder="Ex: 8">
+                                <small class="ref-hint">Cognição + energia</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="dhea">DHEA-S <span class="ref-normal">(Normal: 150-400 µg/dL)</span></label>
+                                <input type="number" step="1" id="dhea" placeholder="Ex: 250">
+                                <small class="ref-hint">Vitalidade geral</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="b6">Vitamina B6 <span class="ref-normal">(Normal: &gt;20 nmol/L)</span></label>
+                                <input type="number" step="0.1" id="b6" placeholder="Ex: 25">
+                                <small class="ref-hint">Metabolismo energético</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="albumina">Albumina <span class="ref-normal">(Normal: 3,5-5,0 g/dL)</span></label>
+                                <input type="number" step="0.1" id="albumina" placeholder="Ex: 4.2">
+                                <small class="ref-hint">Recuperação muscular</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ESCALAS SUBJETIVAS DE ENERGIA -->
+                    <div class="form-section">
+                        <div class="tier-header">
+                            <h3>⚡ Escalas Subjetivas de Energia</h3>
+                            <p class="tier-description">Como você se sentiu durante o dia/plantão</p>
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="energiaAcordar">Energia ao Acordar <span class="ref-normal">(1-10)</span></label>
+                                <input type="range" min="1" max="10" id="energiaAcordar" value="5" class="slider">
+                                <span class="range-value">5</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="energiaMeioDia">Energia Meio-dia <span class="ref-normal">(1-10)</span></label>
+                                <input type="range" min="1" max="10" id="energiaMeioDia" value="5" class="slider">
+                                <span class="range-value">5</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="energiaFimDia">Energia Fim do Dia <span class="ref-normal">(1-10)</span></label>
+                                <input type="range" min="1" max="10" id="energiaFimDia" value="5" class="slider">
+                                <span class="range-value">5</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="clarezaMental">Clareza Mental <span class="ref-normal">(1-10)</span></label>
+                                <input type="range" min="1" max="10" id="clarezaMental" value="5" class="slider">
+                                <span class="range-value">5</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="foco">Foco/Concentração <span class="ref-normal">(1-10)</span></label>
+                                <input type="range" min="1" max="10" id="foco" value="5" class="slider">
+                                <span class="range-value">5</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="stress">Nível de Stress <span class="ref-normal">(1-10)</span></label>
+                                <input type="range" min="1" max="10" id="stress" value="5" class="slider">
+                                <span class="range-value">5</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Observações -->
-                    <div class="form-group">
-                        <label for="observacoes">Observações (como se sentiu, sintomas, etc.)</label>
-                        <textarea id="observacoes" rows="3" placeholder="Ex: Acordei com dor de cabeça, mas melhorei no fim do dia..."></textarea>
+                    <div class="form-group full">
+                        <label for="observacoes">Observações Importantes</label>
+                        <textarea id="observacoes" rows="4" placeholder="Ex: Plantão de 12h noturno | Acordei mal | Dor de cabeça persistente | Fraqueza nas pernas..."></textarea>
                     </div>
 
                     <div class="form-buttons">

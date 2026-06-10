@@ -179,12 +179,14 @@ function loadDashboard() {
     });
     
     // Energias subjetivas
-    const energiaMedia = (parseInt(ultimo.energiaAcordar || 5) + 
-                         parseInt(ultimo.energiaMeioDia || 5) + 
-                         parseInt(ultimo.energiaFimDia || 5)) / 3;
+    const energiaAcordar = parseInt(ultimo.energiaAcordar || 5);
+    const energiaMeioDia = parseInt(ultimo.energiaMeioDia || 5);
+    const energiaFimDia = parseInt(ultimo.energiaFimDia || 5);
+    const energiaMedia = (energiaAcordar + energiaMeioDia + energiaFimDia) / 3;
     
     const clarezaMedia = parseInt(ultimo.clarezaMental || 5);
     const focoMedia = parseInt(ultimo.foco || 5);
+    const stressMedia = parseInt(ultimo.stress || 5);
     
     // Score de vitalidade baseado em exames + subjetivo
     scoreVitalidade = Math.max(0, Math.min(100, scoreVitalidade + (energiaMedia * 3)));
@@ -193,31 +195,117 @@ function loadDashboard() {
                              scoreVitalidade >= 50 ? '🟡 ADEQUADO' : 
                              '🔴 CRÍTICO';
     
+    const statusColor = scoreVitalidade >= 75 ? '#16a34a' : 
+                        scoreVitalidade >= 50 ? '#ca8a04' : 
+                        '#dc2626';
+    
     content.innerHTML = `
         <h2>📊 Dashboard - Vitalidade 360</h2>
-        <div class="vitality-card">
-            <h3>🔋 Último Registro (${ultimo.date})</h3>
-            
-            <p style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem;">
-                Score de Vitalidade: <span style="color: ${scoreVitalidade >= 75 ? '#16a34a' : scoreVitalidade >= 50 ? '#ca8a04' : '#dc2626'};">${scoreVitalidade.toFixed(0)}/100 ${statusVitalidade}</span>
-            </p>
-            
-            <h4 style="margin-top: 1.5rem; margin-bottom: 1rem; font-weight: 600;">⚡ Escalas Subjetivas</h4>
-            <p><strong>Energia ao acordar:</strong> ${ultimo.energiaAcordar || 5}/10</p>
-            <p><strong>Energia meio-dia:</strong> ${ultimo.energiaMeioDia || 5}/10</p>
-            <p><strong>Energia fim do dia:</strong> ${ultimo.energiaFimDia || 5}/10</p>
-            <p><strong>Clareza Mental:</strong> ${ultimo.clarezaMental || 5}/10</p>
-            <p><strong>Foco/Concentração:</strong> ${ultimo.foco || 5}/10</p>
-            <p><strong>Nível de Stress:</strong> ${ultimo.stress || 5}/10</p>
-            
-            <h4 style="margin-top: 1.5rem; margin-bottom: 1rem; font-weight: 600;">🧪 Análise de Exames</h4>
-            ${alertasHtml || '<p style="color: #666;">Nenhum exame registrado ainda.</p>'}
-            
-            ${ultimo.observacoes ? `
-                <h4 style="margin-top: 1.5rem; margin-bottom: 1rem; font-weight: 600;">📝 Observações</h4>
-                <p style="background: #f0f9ff; padding: 1rem; border-radius: 8px; border-left: 4px solid #3b82f6;">${ultimo.observacoes}</p>
-            ` : ''}
+        
+        <!-- CARD PRINCIPAL - SCORE -->
+        <div class="dashboard-main-card">
+            <div class="score-circle">
+                <div class="score-number" style="color: ${statusColor};">${scoreVitalidade.toFixed(0)}</div>
+                <div class="score-label">Vitalidade</div>
+            </div>
+            <div class="score-info">
+                <h3 style="color: ${statusColor}; margin-bottom: 0.5rem;">${statusVitalidade}</h3>
+                <p>Última atualização: ${ultimo.date}</p>
+                <div class="score-bar">
+                    <div class="score-fill" style="width: ${scoreVitalidade}%; background-color: ${statusColor};"></div>
+                </div>
+            </div>
         </div>
+        
+        <!-- GRID DE MÉTRICAS -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-header">
+                    <span class="metric-icon">⚡</span>
+                    <span class="metric-title">Energia Média</span>
+                </div>
+                <div class="metric-large-value">${energiaMedia.toFixed(1)}</div>
+                <div class="metric-scale">/10</div>
+                <div class="metric-breakdown">
+                    <div class="breakdown-item">
+                        <span>Acordar</span>
+                        <span class="breakdown-value">${energiaAcordar}</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>Meio-dia</span>
+                        <span class="breakdown-value">${energiaMeioDia}</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>Fim do dia</span>
+                        <span class="breakdown-value">${energiaFimDia}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-header">
+                    <span class="metric-icon">🧠</span>
+                    <span class="metric-title">Clareza Mental</span>
+                </div>
+                <div class="metric-large-value">${clarezaMedia}</div>
+                <div class="metric-scale">/10</div>
+                <div class="metric-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${clarezaMedia * 10}%; background-color: #3b82f6;"></div>
+                    </div>
+                    <span class="progress-label">${clarezaMedia >= 7 ? '✅ Ótima' : clarezaMedia >= 5 ? '🟡 Adequada' : '🔴 Baixa'}</span>
+                </div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-header">
+                    <span class="metric-icon">🎯</span>
+                    <span class="metric-title">Foco</span>
+                </div>
+                <div class="metric-large-value">${focoMedia}</div>
+                <div class="metric-scale">/10</div>
+                <div class="metric-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${focoMedia * 10}%; background-color: #8b5cf6;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-header">
+                    <span class="metric-icon">😰</span>
+                    <span class="metric-title">Nível de Stress</span>
+                </div>
+                <div class="metric-large-value">${stressMedia}</div>
+                <div class="metric-scale">/10</div>
+                <div class="metric-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${stressMedia * 10}%; background-color: ${stressMedia >= 7 ? '#dc2626' : stressMedia >= 5 ? '#f59e0b' : '#10b981'};"></div>
+                    </div>
+                    <span class="progress-label">${stressMedia >= 7 ? '🔴 Alto' : stressMedia >= 5 ? '🟡 Moderado' : '✅ Baixo'}</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ALERTAS DE EXAMES -->
+        ${examesAnalisados.length > 0 ? `
+            <div class="dashboard-section">
+                <h3>🧪 Análise de Exames</h3>
+                <div class="alerts-container">
+                    ${alertasHtml}
+                </div>
+            </div>
+        ` : ''}
+        
+        <!-- OBSERVAÇÕES -->
+        ${ultimo.observacoes ? `
+            <div class="dashboard-section">
+                <h3>📝 Suas Anotações</h3>
+                <div class="observation-box">
+                    ${ultimo.observacoes}
+                </div>
+            </div>
+        ` : ''}
     `;
 }
 
@@ -325,30 +413,146 @@ function loadHistorico() {
         return;
     }
     
-    let html = '<h2>📋 Histórico Completo - Energia & Vitalidade</h2>';
+    let html = '<h2>📋 Histórico Completo - Energia & Vitalidade</h2><div class="historico-list">';
     
     registros.forEach((reg, index) => {
         const energiaMedia = ((parseInt(reg.energiaAcordar || 5) + parseInt(reg.energiaMeioDia || 5) + parseInt(reg.energiaFimDia || 5)) / 3).toFixed(1);
+        const clarezaMental = reg.clarezaMental || 5;
+        
+        // Status geral baseado em energia
+        const status = energiaMedia >= 7 ? '✅ Excelente' : energiaMedia >= 5 ? '🟡 Adequado' : '🔴 Baixo';
+        const statusColor = energiaMedia >= 7 ? '#16a34a' : energiaMedia >= 5 ? '#ca8a04' : '#dc2626';
         
         html += `
-            <div class="registro-item">
-                <strong>📅 ${reg.date} | Energia Média: ${energiaMedia}/10 | Clareza: ${reg.clarezaMental || 5}/10</strong>
+            <div class="historico-accordion">
+                <div class="historico-header" onclick="toggleHistorico(this)">
+                    <div class="historico-resume">
+                        <span class="historico-data">📅 ${reg.date}</span>
+                        <span class="historico-energy">⚡ ${energiaMedia}/10</span>
+                        <span class="historico-clarity">🧠 ${clarezaMental}/10</span>
+                        <span class="historico-status" style="color: ${statusColor}; font-weight: 600;">${status}</span>
+                    </div>
+                    <span class="expand-icon">▼</span>
+                </div>
                 
-                <br><strong style="border: none; margin: 0;">TIER 1 (Críticos):</strong>
-                TSH: ${reg.tsh || '—'} | Vit D: ${reg.vitaminaD || '—'} | Ferritina: ${reg.ferritina || '—'} | B12: ${reg.b12 || '—'} | Glicose: ${reg.glicose || '—'} | Hemoglobina: ${reg.hemoglobina || '—'}
-                
-                <br><strong style="border: none; margin: 0;">TIER 2:</strong>
-                Magnésio: ${reg.magnesio || '—'} | Zinco: ${reg.zinco || '—'} | Testosterona: ${reg.testosterona || '—'} | Cortisol: ${reg.cortisol || '—'} | Homocisteína: ${reg.homocisteina || '—'} | PCR: ${reg.pcr || '—'}
-                
-                <br><strong style="border: none; margin: 0;">⚡ Escalas:</strong>
-                Acordar: ${reg.energiaAcordar}/10 | Meio-dia: ${reg.energiaMeioDia}/10 | Fim: ${reg.energiaFimDia}/10 | Foco: ${reg.foco || 5}/10 | Stress: ${reg.stress || 5}/10
-                
-                ${reg.observacoes ? `<small>📝 Obs: ${reg.observacoes}</small>` : ''}
+                <div class="historico-content" style="display: none;">
+                    <div class="historico-section">
+                        <h4>⚡ Escalas Subjetivas</h4>
+                        <div class="historico-grid">
+                            <div class="historico-metric">
+                                <span class="metric-label">Acordar</span>
+                                <span class="metric-value">${reg.energiaAcordar}/10</span>
+                            </div>
+                            <div class="historico-metric">
+                                <span class="metric-label">Meio-dia</span>
+                                <span class="metric-value">${reg.energiaMeioDia}/10</span>
+                            </div>
+                            <div class="historico-metric">
+                                <span class="metric-label">Fim do dia</span>
+                                <span class="metric-value">${reg.energiaFimDia}/10</span>
+                            </div>
+                            <div class="historico-metric">
+                                <span class="metric-label">Clareza</span>
+                                <span class="metric-value">${reg.clarezaMental}/10</span>
+                            </div>
+                            <div class="historico-metric">
+                                <span class="metric-label">Foco</span>
+                                <span class="metric-value">${reg.foco || 5}/10</span>
+                            </div>
+                            <div class="historico-metric">
+                                <span class="metric-label">Stress</span>
+                                <span class="metric-value">${reg.stress || 5}/10</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="historico-section">
+                        <h4>🔴 TIER 1 - Exames Críticos</h4>
+                        <div class="historico-grid">
+                            <div class="historico-metric">
+                                <span class="metric-label">TSH</span>
+                                <span class="metric-value">${reg.tsh || '—'}</span>
+                            </div>
+                            <div class="historico-metric">
+                                <span class="metric-label">Vitamina D</span>
+                                <span class="metric-value">${reg.vitaminaD || '—'}</span>
+                            </div>
+                            <div class="historico-metric">
+                                <span class="metric-label">Ferritina</span>
+                                <span class="metric-value">${reg.ferritina || '—'}</span>
+                            </div>
+                            <div class="historico-metric">
+                                <span class="metric-label">B12</span>
+                                <span class="metric-value">${reg.b12 || '—'}</span>
+                            </div>
+                            <div class="historico-metric">
+                                <span class="metric-label">Glicose</span>
+                                <span class="metric-value">${reg.glicose || '—'}</span>
+                            </div>
+                            <div class="historico-metric">
+                                <span class="metric-label">Hemoglobina</span>
+                                <span class="metric-value">${reg.hemoglobina || '—'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="historico-section">
+                        <h4>🟡 TIER 2 - Complementares</h4>
+                        <div class="historico-grid">
+                            <div class="historico-metric">
+                                <span class="metric-label">Magnésio</span>
+                                <span class="metric-value">${reg.magnesio || '—'}</span>
+                            </div>
+                            <div class="historico-metric">
+                                <span class="metric-label">Zinco</span>
+                                <span class="metric-value">${reg.zinco || '—'}</span>
+                            </div>
+                            <div class="historico-metric">
+                                <span class="metric-label">Testosterona</span>
+                                <span class="metric-value">${reg.testosterona || '—'}</span>
+                            </div>
+                            <div class="historico-metric">
+                                <span class="metric-label">Cortisol</span>
+                                <span class="metric-value">${reg.cortisol || '—'}</span>
+                            </div>
+                            <div class="historico-metric">
+                                <span class="metric-label">Homocisteína</span>
+                                <span class="metric-value">${reg.homocisteina || '—'}</span>
+                            </div>
+                            <div class="historico-metric">
+                                <span class="metric-label">PCR</span>
+                                <span class="metric-value">${reg.pcr || '—'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    ${reg.observacoes ? `
+                        <div class="historico-section">
+                            <h4>📝 Observações</h4>
+                            <p style="padding: 0.75rem; background: #f0f9ff; border-radius: 6px; border-left: 3px solid #3b82f6;">${reg.observacoes}</p>
+                        </div>
+                    ` : ''}
+                </div>
             </div>
         `;
     });
     
+    html += '</div>';
     content.innerHTML = html;
+}
+
+// Função para expandir/retrair histórico
+function toggleHistorico(element) {
+    const content = element.parentElement.querySelector('.historico-content');
+    const icon = element.querySelector('.expand-icon');
+    
+    if (content.style.display === 'none') {
+        content.style.display = 'block';
+        icon.style.transform = 'rotate(180deg)';
+    } else {
+        content.style.display = 'none';
+        icon.style.transform = 'rotate(0deg)';
+    }
 }
 
 // ===================================

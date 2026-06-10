@@ -272,6 +272,13 @@ body {
     border-bottom: 2px solid var(--primary);
 }
 
+.section-help {
+    font-size: 0.85rem;
+    color: var(--gray-600);
+    margin-bottom: 1rem;
+    font-style: italic;
+}
+
 .form-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -351,17 +358,7 @@ body {
     background: var(--gray-300);
 }
 
-.btn-danger {
-    background: none;
-    color: #dc2626;
-    padding: 0.5rem;
-}
-
-.btn-danger:hover {
-    color: #991b1b;
-}
-
-/* Charts */
+/* Charts e Histórico mantidos */
 .charts-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
@@ -387,7 +384,6 @@ body {
     height: 300px;
 }
 
-/* Histórico */
 .historico-list {
     display: flex;
     flex-direction: column;

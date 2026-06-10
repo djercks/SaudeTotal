@@ -1,131 +1,174 @@
-// SaudeTotal - Script principal com foco em Energia & Vitalidade
-let records = JSON.parse(localStorage.getItem('healthRecords')) || [];
+// SaudeTotal - Script completo com Vitalidade e PDF
 
+let registros = JSON.parse(localStorage.getItem('saudeRegistros')) || [];
+
+// Tab navigation
 function switchTab(tab) {
-    document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.remove('active');
-    });
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    
-    document.getElementById(tab).classList.add('active');
-    document.querySelector(`button[onclick="switchTab('${tab}')"]`).classList.add('active');
-    
-    if (tab === 'dashboard') renderDashboard();
-    if (tab === 'graficos') renderCharts();
-    if (tab === 'historico') renderHistory();
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+  
+  document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+  document.getElementById(tab).classList.add('active');
+  
+  if (tab === 'dashboard') loadDashboard();
+  if (tab === 'graficos') loadGraficos();
+  if (tab === 'historico') loadHistorico();
 }
 
-function saveRecord(e) {
-    e.preventDefault();
-    
-    const record = {
-        date: document.getElementById('date').value || new Date().toISOString().split('T')[0],
-        peso: parseFloat(document.getElementById('peso').value) || null,
-        pressao: document.getElementById('pressao').value,
-        vitD: parseFloat(document.getElementById('vitD').value) || null,
-        ferritina: parseFloat(document.getElementById('ferritina').value) || null,
-        b12: parseFloat(document.getElementById('b12').value) || null,
-        tsh: parseFloat(document.getElementById('tsh').value) || null,
-        testosterona: parseFloat(document.getElementById('testosterona').value) || null,
-        cortisol: parseFloat(document.getElementById('cortisol').value) || null,
-        energiaAcordar: parseInt(document.getElementById('energiaAcordar').value) || null,
-        energiaFimDia: parseInt(document.getElementById('energiaFimDia').value) || null
-    };
-    
-    records.unshift(record);
-    localStorage.setItem('healthRecords', JSON.stringify(records));
-    
-    alert('✅ Registro salvo com sucesso!');
-    e.target.reset();
-    switchTab('dashboard');
+// PDF Upload
+function uploadExamPDF() {
+  document.getElementById('pdfUpload').click();
 }
 
-function renderDashboard() {
-    const container = document.getElementById('dashboardContent');
-    let html = `<h2>📊 Seu Dashboard de Vitalidade</h2>`;
+async function processPDF(input) {
+  const file = input.files[0];
+  if (!file) return;
+  
+  const loading = document.createElement('div');
+  loading.textContent = 'Processando PDF...';
+  document.body.appendChild(loading);
+  
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+    let fullText = '';
     
-    if (records.length === 0) {
-        html += `<p>Nenhum registro ainda. Comece adicionando um novo!</p>`;
-    } else {
-        const latest = records[0];
-        
-        html += `
-        <div class="card vitality-card" style="margin-bottom:20px;">
-            <h3>🔋 Vitalidade Atual</h3>
-            <p><strong>Energia ao Acordar:</strong> ${latest.energiaAcordar || '—'} / 10</p>
-            <p><strong>Energia Fim do Dia:</strong> ${latest.energiaFimDia || '—'} / 10</p>
-        </div>`;
-        
-        // Alertas
-        html += `<h3>⚠️ Alertas de Energia</h3><ul>`;
-        if (latest.vitD && latest.vitD < 30) html += `<li class="alert-low">🔴 Vitamina D baixa (${latest.vitD}) - pode causar fadiga</li>`;
-        if (latest.ferritina && latest.ferritina < 50) html += `<li class="alert-low">🔴 Ferritina baixa - comum em baixa disposição</li>`;
-        if (latest.b12 && latest.b12 < 300) html += `<li class="alert-low">🔴 B12 baixa</li>`;
-        html += `</ul>`;
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const textContent = await page.getTextContent();
+      fullText += textContent.items.map(item => item.str).join(' ') + '\n';
     }
     
-    container.innerHTML = html;
+    // Extração com regex
+    const data = {
+      vitaminaD: extractValue(fullText, /vitamina\s*d.*?(\d+[.,]?\d*)/i),
+      ferritina: extractValue(fullText, /ferritina.*?(\d+[.,]?\d*)/i),
+      b12: extractValue(fullText, /b12|b12.*?(\d+[.,]?\d*)/i),
+      tsh: extractValue(fullText, /tsh.*?(\d+[.,]?\d*)/i),
+      testosterona: extractValue(fullText, /testosterona.*?(\d+[.,]?\d*)/i),
+    };
+    
+    // Preencher formulário
+    if (data.vitaminaD) document.getElementById('vitaminaD').value = data.vitaminaD;
+    if (data.ferritina) document.getElementById('ferritina').value = data.ferritina;
+    if (data.b12) document.getElementById('b12').value = data.b12;
+    if (data.tsh) document.getElementById('tsh').value = data.tsh;
+    if (data.testosterona) document.getElementById('testosterona').value = data.testosterona;
+    
+    alert('✅ Extração concluída! Verifique e ajuste os valores.');
+  } catch (e) {
+    alert('Erro ao processar PDF: ' + e.message);
+  } finally {
+    loading.remove();
+  }
 }
 
-function renderCharts() {
-    const ctx = document.getElementById('vitalityChart');
-    if (!ctx) return;
-    
-    if (window.myChart) window.myChart.destroy();
-    
-    const dates = records.slice(0, 7).map(r => r.date).reverse();
-    const energias = records.slice(0, 7).map(r => r.energiaAcordar || 0).reverse();
-    
-    window.myChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: dates,
-            datasets: [{
-                label: 'Energia ao Acordar',
-                data: energias,
-                borderColor: '#4facfe',
-                tension: 0.4
-            }]
-        },
-        options: { responsive: true }
+function extractValue(text, regex) {
+  const match = text.match(regex);
+  return match ? parseFloat(match[1].replace(',', '.')) : null;
+}
+
+// Form submit
+document.getElementById('healthForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  const formData = {
+    date: document.getElementById('date').value || new Date().toISOString().split('T')[0],
+    energiaAcordar: parseInt(document.getElementById('energiaAcordar')?.value || 5),
+    energiaMeioDia: parseInt(document.getElementById('energiaMeioDia')?.value || 5),
+    energiaFimDia: parseInt(document.getElementById('energiaFimDia')?.value || 5),
+    vitaminaD: parseFloat(document.getElementById('vitaminaD')?.value) || null,
+    ferritina: parseFloat(document.getElementById('ferritina')?.value) || null,
+    b12: parseFloat(document.getElementById('b12')?.value) || null,
+    tsh: parseFloat(document.getElementById('tsh')?.value) || null,
+    testosterona: parseFloat(document.getElementById('testosterona')?.value) || null,
+    cortisol: parseFloat(document.getElementById('cortisol')?.value) || null,
+    observacoes: document.getElementById('observacoes')?.value || ''
+  };
+  
+  registros.unshift(formData);
+  localStorage.setItem('saudeRegistros', JSON.stringify(registros));
+  
+  alert('Registro salvo com sucesso!');
+  switchTab('dashboard');
+  this.reset();
+});
+
+// Load functions
+function loadDashboard() {
+  const content = document.getElementById('dashboardContent');
+  if (registros.length === 0) {
+    content.innerHTML = `
+      <h2>📊 Dashboard - Vitalidade</h2>
+      <div class="vitality-card">
+        <h3>🔋 Sua Vitalidade Atual</h3>
+        <p>Preencha seu primeiro registro para ver scores e alertas de energia.</p>
+      </div>
+    `;
+    return;
+  }
+
+  const ultimo = registros[0];
+  let alertas = '';
+
+  if (ultimo.vitaminaD && ultimo.vitaminaD < 30) alertas += `<p style="color:orange">⚠️ Vitamina D baixa (${ultimo.vitaminaD}) → pode explicar cansaço</p>`;
+  if (ultimo.ferritina && ultimo.ferritina < 50) alertas += `<p style="color:orange">⚠️ Ferritina baixa (${ultimo.ferritina}) → energia baixa</p>`;
+  if (ultimo.testosterona && ultimo.testosterona < 8) alertas += `<p style="color:orange">⚠️ Testosterona Livre baixa</p>`;
+
+  content.innerHTML = `
+    <h2>📊 Dashboard - Vitalidade</h2>
+    <div class="vitality-card">
+      <h3>🔋 Último Registro (${ultimo.date})</h3>
+      <p><strong>Energia ao acordar:</strong> ${ultimo.energiaAcordar}/10</p>
+      <p><strong>Meio-dia:</strong> ${ultimo.energiaMeioDia}/10</p>
+      <p><strong>Fim do dia:</strong> ${ultimo.energiaFimDia}/10</p>
+      <hr>
+      <p><strong>Vit D:</strong> ${ultimo.vitaminaD || '—'}</p>
+      <p><strong>Ferritina:</strong> ${ultimo.ferritina || '—'}</p>
+      <p><strong>B12:</strong> ${ultimo.b12 || '—'}</p>
+      <p><strong>Testosterona Livre:</strong> ${ultimo.testosterona || '—'}</p>
+      <p><strong>Cortisol:</strong> ${ultimo.cortisol || '—'}</p>
+      ${alertas}
+    </div>
+  `;
+}
+
+function loadGraficos() {
+  document.getElementById('graficosContent').innerHTML = '<h2>📈 Gráficos de Evolução em breve</h2>';
+}
+
+function loadHistorico() {
+  const content = document.getElementById('historicoContent');
+  let html = `<h2>📋 Histórico Completo - Energia &amp; Vitalidade</h2>`;
+
+  if (registros.length === 0) {
+    html += `<p>Nenhum registro ainda.</p>`;
+  } else {
+    registros.forEach((reg, index) => {
+      html += `
+        <div class="registro-item" style="background:white; padding:15px; margin:10px 0; border-radius:8px; border-left:5px solid #4a90e2;">
+          <strong>${reg.date}</strong><br>
+          Energia: Acordar ${reg.energiaAcordar} | Meio ${reg.energiaMeioDia} | Fim ${reg.energiaFimDia}<br>
+          Vit D: ${reg.vitaminaD || '—'} | Ferritina: ${reg.ferritina || '—'} | B12: ${reg.b12 || '—'}<br>
+          Testosterona Livre: ${reg.testosterona || '—'} | Cortisol: ${reg.cortisol || '—'}
+          ${reg.observacoes ? `<br><small>Obs: ${reg.observacoes}</small>` : ''}
+        </div>
+      `;
     });
-}
+  }
 
-function renderHistory() {
-    const container = document.getElementById('historyList');
-    let html = '';
-    
-    records.forEach((r, i) => {
-        html += `
-        <div class="card" style="margin-bottom:15px;">
-            <strong>${r.date}</strong><br>
-            Energia: ${r.energiaAcordar || '—'} → ${r.energiaFimDia || '—'}<br>
-            Vit D: ${r.vitD || '—'} | Ferritina: ${r.ferritina || '—'}
-        </div>`;
-    });
-    
-    container.innerHTML = html || '<p>Nenhum registro encontrado.</p>';
-}
-
-// PDF Upload & Extraction (basic)
-async function processPDF(input) {
-    const file = input.files[0];
-    if (!file) return;
-    
-    alert('📄 Processando PDF... (extração básica por texto)');
-    
-    // Demo fill
-    document.getElementById('vitD').value = (25 + Math.random()*40).toFixed(1);
-    document.getElementById('ferritina').value = (30 + Math.random()*100).toFixed(1);
-    document.getElementById('b12').value = (200 + Math.random()*400).toFixed(0);
-    
-    alert('✅ Dados extraídos e preenchidos automaticamente! Revise e salve.');
+  content.innerHTML = html;
 }
 
 // Init
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('date').value = new Date().toISOString().split('T')[0];
-    switchTab('dashboard');
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      switchTab(btn.dataset.tab);
+    });
+  });
+  
+  loadDashboard();
 });
+
+console.log('✅ SaudeTotal carregado com sucesso!');

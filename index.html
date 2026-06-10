@@ -3,131 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SaúdeTotal - Vitalidade & Energia</title>
+    <title>Saúde & Bem-estar - Rastreador de Saúde</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 0; background: #f4f6f9; }
-        .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        .tab-btn { padding: 12px 20px; background: #fff; border: 1px solid #ddd; border-radius: 8px; cursor: pointer; font-weight: 600; }
-        .tab-btn.active { background: #0066cc; color: white; border-color: #0066cc; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
-        .btn { padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
-        .btn-primary { background: #0066cc; color: white; }
-        .btn-secondary { background: #666; color: white; }
-        .vitality-card { background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; }
-        .alert-low { color: #d32f2f; font-weight: bold; }
-    </style>
 </head>
 <body>
-    <header style="background: #0066cc; color: white; padding: 20px; text-align: center;">
-        <h1>🌟 SaúdeTotal - Foco em Energia & Vitalidade</h1>
-        <p>Rastreie sua disposição diária</p>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-title">
+                <div class="icon-circle">📊</div>
+                <h1>Saúde & Bem-estar</h1>
+            </div>
+            <p class="header-subtitle">Rastreie sua evolução - Foco em Vitalidade</p>
+        </div>
     </header>
 
-    <div class="container">
+    <!-- Main -->
+    <main class="container">
+        <!-- Navigation Tabs -->
         <nav class="tabs">
-            <button class="tab-btn active" onclick="switchTab('dashboard')">📊 Dashboard</button>
-            <button class="tab-btn" onclick="switchTab('novo')">➕ Novo Registro</button>
-            <button class="tab-btn" onclick="switchTab('graficos')">📈 Gráficos</button>
-            <button class="tab-btn" onclick="switchTab('historico')">📋 Histórico</button>
+            <button class="tab-btn active" data-tab="dashboard">📊 Dashboard</button>
+            <button class="tab-btn" data-tab="novo">➕ Novo Registro</button>
+            <button class="tab-btn" data-tab="graficos">📈 Gráficos</button>
+            <button class="tab-btn" data-tab="historico">📋 Histórico</button>
         </nav>
 
-        <!-- Dashboard -->
-        <div id="dashboard" class="tab-content active">
-            <div id="dashboardContent" class="card"></div>
+        <!-- Dashboard Tab -->
+        <div class="tab-content active" id="dashboard">
+            <div id="dashboardContent"></div>
         </div>
 
-        <!-- Novo Registro -->
-        <div id="novo" class="tab-content">
-            <div class="card">
-                <h2>Novo Registro de Saúde</h2>
-                <button onclick="document.getElementById('pdfUpload').click()" class="btn btn-secondary" style="margin-bottom:15px;">📄 Extrair dados de PDF do Exame</button>
-                <input type="file" id="pdfUpload" accept=".pdf" style="display:none;" onchange="processPDF(this)">
-
-                <form id="healthForm" onsubmit="saveRecord(event)">
+        <!-- Novo Registro Tab -->
+        <div class="tab-content" id="novo">
+            <div class="form-container">
+                <h2>Novo Check-up</h2>
+                <div style="margin-bottom: 1rem;">
+                    <button onclick="uploadExamPDF()" class="btn btn-secondary">📄 Extrair de PDF (Exame)</button>
+                    <input type="file" id="pdfUpload" accept=".pdf" style="display:none;" onchange="processPDF(this)">
+                </div>
+                <form id="healthForm">
                     <div class="form-grid">
                         <div class="form-group">
-                            <label>Data</label>
+                            <label for="date">Data</label>
                             <input type="date" id="date" required>
                         </div>
-                        <div class="form-group">
-                            <label>Peso (kg)</label>
-                            <input type="number" step="0.1" id="peso">
-                        </div>
-                        <div class="form-group">
-                            <label>Pressão Arterial</label>
-                            <input type="text" id="pressao" placeholder="120/80">
-                        </div>
+                    </div>
 
-                        <!-- Seção Energia & Vitalidade -->
-                        <div class="form-group" style="grid-column: 1 / -1; background:#f0f8ff; padding:15px; border-radius:8px;">
-                            <h3>🔋 Energia & Vitalidade</h3>
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label>Vitamina D (ng/mL)</label>
-                                    <input type="number" step="0.1" id="vitD">
-                                </div>
-                                <div class="form-group">
-                                    <label>Ferritina (ng/mL)</label>
-                                    <input type="number" step="0.1" id="ferritina">
-                                </div>
-                                <div class="form-group">
-                                    <label>Vitamina B12 (pg/mL)</label>
-                                    <input type="number" step="0.1" id="b12">
-                                </div>
-                                <div class="form-group">
-                                    <label>TSH (µUI/mL)</label>
-                                    <input type="number" step="0.01" id="tsh">
-                                </div>
-                                <div class="form-group">
-                                    <label>Testosterona (ng/dL)</label>
-                                    <input type="number" step="0.1" id="testosterona">
-                                </div>
-                                <div class="form-group">
-                                    <label>Cortisol manhã (µg/dL)</label>
-                                    <input type="number" step="0.1" id="cortisol">
-                                </div>
-                                <div class="form-group">
-                                    <label>Energia ao Acordar (1-10)</label>
-                                    <input type="number" min="1" max="10" id="energiaAcordar">
-                                </div>
-                                <div class="form-group">
-                                    <label>Energia Fim do Dia (1-10)</label>
-                                    <input type="number" min="1" max="10" id="energiaFimDia">
-                                </div>
+                    <!-- Seção Energia & Vitalidade -->
+                    <div class="form-section">
+                        <h3>🔋 Energia &amp; Vitalidade</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="vitaminaD">Vitamina D (ng/mL)</label>
+                                <input type="number" step="0.1" id="vitaminaD" placeholder="Ex: 45.2">
+                            </div>
+                            <div class="form-group">
+                                <label for="ferritina">Ferritina (ng/mL)</label>
+                                <input type="number" step="0.1" id="ferritina" placeholder="Ex: 120">
+                            </div>
+                            <div class="form-group">
+                                <label for="b12">Vitamina B12 (pg/mL)</label>
+                                <input type="number" step="0.1" id="b12" placeholder="Ex: 450">
+                            </div>
+                            <div class="form-group">
+                                <label for="tsh">TSH (µUI/mL)</label>
+                                <input type="number" step="0.01" id="tsh" placeholder="Ex: 2.5">
+                            </div>
+                            <div class="form-group">
+                                <label for="testosterona">Testosterona Livre (ng/dL)</label>
+                                <input type="number" step="0.1" id="testosterona" placeholder="Ex: 12.5">
+                            </div>
+                            <div class="form-group">
+                                <label for="cortisol">Cortisol Manhã / Basal (µg/dL)</label>
+                                <input type="number" step="0.1" id="cortisol" placeholder="Ex: 18.5">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="energiaAcordar">Energia ao Acordar (1-10)</label>
+                                <input type="number" min="1" max="10" id="energiaAcordar" value="5">
+                            </div>
+                            <div class="form-group">
+                                <label for="energiaMeioDia">Energia Meio-dia (1-10)</label>
+                                <input type="number" min="1" max="10" id="energiaMeioDia" value="5">
+                            </div>
+                            <div class="form-group">
+                                <label for="energiaFimDia">Energia Fim do Dia (1-10)</label>
+                                <input type="number" min="1" max="10" id="energiaFimDia" value="5">
                             </div>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary" style="margin-top:20px;">💾 Salvar Registro</button>
+
+                    <!-- Observações -->
+                    <div class="form-group">
+                        <label for="observacoes">Observações (como se sentiu, sintomas, etc.)</label>
+                        <textarea id="observacoes" rows="3" placeholder="Ex: Acordei com dor de cabeça, mas melhorei no fim do dia..."></textarea>
+                    </div>
+
+                    <div class="form-buttons">
+                        <button type="submit" class="btn btn-primary">💾 Salvar Registro</button>
+                        <button type="button" class="btn btn-secondary" onclick="switchTab('dashboard')">Cancelar</button>
+                    </div>
                 </form>
             </div>
         </div>
 
-        <!-- Gráficos -->
-        <div id="graficos" class="tab-content">
-            <div class="card">
-                <h2>📈 Evolução da Vitalidade</h2>
-                <canvas id="vitalityChart" height="120"></canvas>
-            </div>
+        <!-- Other tabs -->
+        <div class="tab-content" id="graficos">
+            <div id="graficosContent"></div>
         </div>
 
-        <!-- Histórico -->
-        <div id="historico" class="tab-content">
-            <div class="card" id="historicoContent">
-                <h2>Histórico de Registros</h2>
-                <div id="historyList"></div>
-            </div>
+        <div class="tab-content" id="historico">
+            <div id="historicoContent"></div>
         </div>
-    </div>
+    </main>
 
     <script src="script.js"></script>
 </body>

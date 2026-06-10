@@ -15,7 +15,7 @@
                 <div class="icon-circle">📊</div>
                 <h1>Saúde & Bem-estar</h1>
             </div>
-            <p class="header-subtitle">Rastreie sua evolução</p>
+            <p class="header-subtitle">Rastreie sua evolução - Foco em Vitalidade</p>
         </div>
     </header>
 
@@ -141,9 +141,53 @@
                         </div>
                     </div>
 
+                    <!-- Nova Seção: Energia & Vitalidade -->
+                    <div class="form-section">
+                        <h3>🔋 Energia & Vitalidade</h3>
+                        <p class="section-help">Campos chave para disposição e energia diária</p>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="vitaminD">Vitamina D (ng/mL)</label>
+                                <input type="number" id="vitaminD" placeholder="40" step="0.1">
+                            </div>
+                            <div class="form-group">
+                                <label for="ferritin">Ferritina (ng/mL)</label>
+                                <input type="number" id="ferritin" placeholder="100" step="1">
+                            </div>
+                            <div class="form-group">
+                                <label for="b12">Vitamina B12 (pg/mL)</label>
+                                <input type="number" id="b12" placeholder="400" step="1">
+                            </div>
+                            <div class="form-group">
+                                <label for="tsh">TSH (µUI/mL)</label>
+                                <input type="number" id="tsh" placeholder="2.0" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label for="testosterone">Testosterona (ng/dL) <span style="font-size:0.75rem;color:#666;">(opcional)</span></label>
+                                <input type="number" id="testosterone" placeholder="500" step="1">
+                            </div>
+                            <div class="form-group">
+                                <label for="cortisol">Cortisol Manhã (µg/dL)</label>
+                                <input type="number" id="cortisol" placeholder="15" step="0.1">
+                            </div>
+                            <div class="form-group">
+                                <label for="energyMorning">Energia ao Acordar (1-10)</label>
+                                <input type="number" id="energyMorning" placeholder="7" min="1" max="10">
+                            </div>
+                            <div class="form-group">
+                                <label for="energyMidday">Energia Meio-dia (1-10)</label>
+                                <input type="number" id="energyMidday" placeholder="6" min="1" max="10">
+                            </div>
+                            <div class="form-group">
+                                <label for="energyEvening">Energia Fim do Dia (1-10)</label>
+                                <input type="number" id="energyEvening" placeholder="5" min="1" max="10">
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="form-group full">
                         <label for="notes">Observações</label>
-                        <textarea id="notes" placeholder="Qualquer observação adicional..." rows="3"></textarea>
+                        <textarea id="notes" placeholder="Qualquer observação adicional... (ex: disposição, sono, humor, vitalidade)" rows="3"></textarea>
                     </div>
                     <div class="form-buttons">
                         <button type="submit" class="btn btn-primary">💾 Salvar Registro</button>
